@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.miniapplication.repository.UserRepository">  <!-- (1) -->
+   <insert id="registUser" parameterType="com.example.miniapplication.repository.request.UserInformationRequest">
+       INSERT INTO user(
+           user_name
+           ,password
+           ,created_at
+       ) VALUES (
+           #{userName}
+           ,#{password}
+           ,now()
+       )
+   </insert>
+
+    <select id="fetchByUserName" parameterType="string" resultType="com.example.miniapplication.repository.response.UserInformationResponse">
+        SELECT
+            id as userId
+            ,user_name as userName
+            ,password as password
+        FROM user WHERE user_name = #{userName};
+    </select>
+
+    <select id="isUniqueUserName" parameterType="string" resultType="int">
+        SELECT COUNT(id) FROM user WHERE user_name = #{userName};
+    </select>
+
+    <select id="getPostingHistory" parameterType="int" resultType="com.example.miniapplication.repository.response.PostResponse">
+        SELECT
+            id as postId
+            ,user_Id as userId
+            ,body as contents
+            ,DATE_FORMAT(created_at, '%Y/%m-%d/%H:%i:%s') as createdDate
+        FROM status WHERE user_id = #{userId}
+        ORDER BY created_at desc;
+    </select>
+
+    <select id="getOtherLatestHistory" parameterType="int" resultType="com.example.miniapplication.repository.response.PostResponse">
+        SELECT
+            status.id as postId
+            ,status.user_Id as userId
+            ,user.user_name as userName
+            ,status.body as contents
+            ,DATE_FORMAT(status.created_at, '%Y/%m-%d/%H:%i:%s') as createdDate
+        FROM status JOIN user ON status.user_id = user.id
+        WHERE status.user_id != #{userId}
+        ORDER BY status.created_at desc
+        LIMIT 10;
+    </select>
+
+    <insert id="posting" parameterType="com.example.miniapplication.repository.request.PostingRequestForDb">
+        INSERT INTO status(
+            user_id
+            ,body
+            ,created_at
+        ) VALUES (
+            #{userId}
+            ,#{postingMessage}
+            ,now()
+        )
+    </insert>
+
+    <insert id="insertFollowing" parameterType="com.example.miniapplication.repository.request.FollowingInformation">
+        INSERT INTO following VALUES(#{userId}, #{followingId});
+    </insert>
+
+    <select id="isFollowing" parameterType="com.example.miniapplication.repository.request.FollowingInformation" resultType="int">
+        SELECT COUNT(user_id) FROM following WHERE user_id = #{userId} and following_id = #{followingId};
+    </select>
+</mapper>

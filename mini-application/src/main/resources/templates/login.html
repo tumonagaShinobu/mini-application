@@ -1,0 +1,25 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>ログイン画面</title>
+</head>
+<body>
+<h1>ログインフォーム</h1>
+<div th:if="${param.error}">ユーザーIDもしくはパスワードが間違っています</div>
+<div th:if="${param.logout}">ログアウトしました</div>
+<div th:if="${isRegist}">アカウントの登録に成功しました</div>
+<a href="/regist" th:if="!${param.error} and !${param.logout} and !${isRegist}">新規登録</a>
+
+<form action="#" th:action="@{/account/login}"　method="post">
+    <p>
+        <label for="userName">ユーザーID</label>
+        <input type="text" name="userName" id="userName">
+    </p>
+    <p>
+        <label for="password">パスワード</label>
+        <input type="text" name="password" id="password">
+    </p>
+    <input type="submit" value="ログイン">
+</form>
+</body>
+</html>

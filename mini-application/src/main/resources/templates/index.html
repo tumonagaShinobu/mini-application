@@ -1,0 +1,50 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+    <title>ミニブログ</title>
+</head>
+<body>
+    <header>
+        <h1>ホーム</h1>
+        <div th:if="${userName}">ようこそ[[${userName}]]さん</div>
+        <p th:if="${param.isSuccess}" th:style="'font-weight: bold'">投稿に成功しました</p>
+        <form action="#" th:action="@{/logout}" method="post" id="logoutForm">
+            <input type="submit" value="ログアウト">
+        </form>
+    </header>
+    <section class="postingArea">
+        <form action="#" th:action="@{/posting}" method="post">
+            <p>投稿欄</p>
+            <textarea name="postingMessage" rows="4" cols="40"></textarea>
+            <br>
+            <input type="submit" value="投稿">
+            <input type="reset" value="リセット">
+        </form>
+    </section>
+
+    <section class="myPost" th:if="!${#lists.isEmpty(postingHistory)}" >
+        <h3>投稿履歴</h3>
+        <table>
+            <tr th:each="post, element : ${postingHistory}" th:object="${post}">
+                <td>投稿日:[[*{createdDate}]]</td>
+                <td>投稿内容:[[*{contents}]]</td>
+            </tr>
+        </table>
+    </section>
+
+    <section class="otherLatestPost" th:if="!${#lists.isEmpty(otherPostingHistory)}" >
+        <h3>他の人の投稿</h3>
+        <table>
+            <tr th:each="post, element : ${otherPostingHistory}" th:object="${post}">
+                <td th:id="*{userId} + 'Follow'" th:attr="onclick='followUser(' + *{userId} + ')'">投稿者:[[*{userName}]](クリックしてフォローする)</td>
+                <td>投稿日:[[*{createdDate}]]</td>
+                <td>投稿内容:[[*{contents}]]</td>
+            </tr>
+        </table>
+    </section>
+
+    <script src="/js/follow.js" th:src="@{/js/follow.js}"></script>
+</body>
+</html>
